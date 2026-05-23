@@ -1,105 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-    *{
-        margin:0;
-        padding:0;
-        box-sizing:border-box;
-    }
 
-    body{
-        width:100vw;
-        height:100vh;
-        overflow:hidden;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        background:black;
-        font-family:Arial, sans-serif;
-    }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    image-rendering:pixelated;
+    image-rendering:crisp-edges;
+}
 
-    .player{
-        position:relative;
-        width:500px;
-        height:500px;
-    }
+body{
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            #000 0px,
+            #000 2px,
+            #050505 2px,
+            #050505 4px
+        );
+    font-family:"Courier New", monospace;
+    filter:blur(0.6px) contrast(1.15);
+}
 
-    /* Layer 0 */
-    .border{
-        position:absolute;
-        width:100%;
-        height:100%;
-        object-fit:contain;
-        z-index:0;
-        pointer-events:none;
-    }
+.player{
+    position:relative;
+    width:520px;
+    height:520px;
+    filter:
+        saturate(0.8)
+        contrast(1.2);
+}
 
-    /* Layer 2 */
-    .album-cover{
-        position:absolute;
-        width:250px;
-        height:250px;
-        border-radius:50%;
-        object-fit:cover;
-        top:50%;
-        left:50%;
-        transform:translate(-50%, -50%);
-        z-index:2;
-        box-shadow:0 0 20px rgba(0,0,0,0.7);
-    }
+/* Border */
+.border{
+    position:absolute;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    z-index:0;
+    pointer-events:none;
+}
 
-    /* Layer 3 */
-    .cd{
-        position:absolute;
-        width:320px;
-        height:320px;
-        top:50%;
-        left:50%;
-        transform:translate(-50%, -50%);
-        z-index:3;
-        opacity:0.7;
-        pointer-events:none;
-    }
+/* Album Cover */
+.album-cover{
+    position:absolute;
+    width:250px;
+    height:250px;
+    object-fit:cover;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -56%);
+    z-index:2;
 
-    .spin{
-        animation:spin 5s linear infinite;
-    }
+    border:
+        4px solid rgba(255,255,255,0.15);
 
-    @keyframes spin{
-        from{
-            transform:translate(-50%, -50%) rotate(0deg);
-        }
-        to{
-            transform:translate(-50%, -50%) rotate(360deg);
-        }
-    }
+    filter:
+        blur(1px)
+        contrast(1.2)
+        saturate(0.85);
 
-    .controls{
-        position:absolute;
-        width:100%;
-        bottom:35px;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        gap:25px;
-        z-index:5;
-    }
+    box-shadow:
+        0 0 30px rgba(0,0,0,0.8);
+}
 
-    .btn{
-        width:70px;
-        height:70px;
-        cursor:pointer;
-        transition:0.2s;
-        user-select:none;
-    }
+/* VHS Noise */
+.noise{
+    position:absolute;
+    inset:0;
+    z-index:20;
+    pointer-events:none;
+    opacity:0.12;
+    mix-blend-mode:screen;
+    background-image:url("https://grainy-gradients.vercel.app/noise.svg");
+}
 
-    .btn:hover{
-        transform:scale(1.1);
-    }
+/* Song Info */
+.song-info{
+    position:absolute;
+    top:40px;
+    left:50%;
+    transform:translateX(-50%);
+    width:80%;
+    text-align:center;
+    z-index:10;
+    color:white;
+    text-shadow:2px 2px black;
+}
+
+.song-title{
+    font-size:22px;
+    font-weight:bold;
+    letter-spacing:2px;
+    margin-bottom:6px;
+}
+
+.song-artist{
+    font-size:14px;
+    opacity:0.8;
+    letter-spacing:1px;
+}
+
+/* Timestamp */
+.timestamp{
+    position:absolute;
+    bottom:115px;
+    left:50%;
+    transform:translateX(-50%);
+    color:#d8d8d8;
+    font-size:16px;
+    z-index:10;
+    letter-spacing:2px;
+    text-shadow:2px 2px black;
+}
+
+/* Controls */
+.controls{
+    position:absolute;
+    width:100%;
+    bottom:30px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:24px;
+    z-index:10;
+}
+
+.btn{
+    width:70px;
+    height:70px;
+    cursor:pointer;
+    transition:0.15s;
+    filter:
+        blur(0.5px)
+        contrast(1.2);
+}
+
+.btn:hover{
+    transform:scale(1.08);
+}
 
 </style>
 </head>
@@ -108,31 +158,55 @@
 
 <div class="player">
 
-    <!-- Layer 0 -->
+    <!-- Border -->
     <img src="Border.webp" class="border">
 
-    <!-- Layer 2 -->
-    <img id="cover" class="album-cover">
+    <!-- Song Info -->
+    <div class="song-info">
 
-    <!-- Layer 3 -->
-    <img src="CD.webp" id="cd" class="cd">
+        <div class="song-title" id="songTitle">
+            LOADING...
+        </div>
 
-    <div class="controls">
-
-        <!-- Play/Pause Toggle -->
-        <img id="playPauseBtn" class="btn" src="Play.webp">
-
-        <!-- Random -->
-        <img id="randomBtn" class="btn" src="Random.webp">
-
-        <!-- Download -->
-        <img id="downloadBtn" class="btn" src="Download.webp">
+        <div class="song-artist" id="songArtist">
+            PLEASE WAIT
+        </div>
 
     </div>
 
+    <!-- Cover -->
+    <img id="cover" class="album-cover">
+
+    <!-- Timestamp -->
+    <div class="timestamp" id="timestamp">
+        0:00 / 0:00
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+
+        <!-- Toggle Button -->
+        <img id="playPauseBtn"
+        class="btn"
+        src="Play.webp">
+
+        <!-- Random -->
+        <img id="randomBtn"
+        class="btn"
+        src="Random.webp">
+
+        <!-- Download -->
+        <img id="downloadBtn"
+        class="btn"
+        src="Download.webp">
+
+    </div>
+
+    <!-- Noise -->
+    <div class="noise"></div>
+
 </div>
 
-<!-- Hidden YouTube Player -->
 <div id="player" style="display:none;"></div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -141,160 +215,75 @@
 
 const songs = [
 
-    /* Kanye West */
-    {
-        title: "Stronger",
-        videoId: "PsO6ZnUZI0g",
-        cover: "https://i.ytimg.com/vi/PsO6ZnUZI0g/maxresdefault.jpg"
-    },
+{
+title:"Heartless",
+artist:"Kanye West",
+videoId:"Co0tTeuUVhU",
+cover:"https://i.ytimg.com/vi/Co0tTeuUVhU/maxresdefault.jpg"
+},
 
-    {
-        title: "Heartless",
-        videoId: "Co0tTeuUVhU",
-        cover: "https://i.ytimg.com/vi/Co0tTeuUVhU/maxresdefault.jpg"
-    },
+{
+title:"Power",
+artist:"Kanye West",
+videoId:"L53gjP-TtGE",
+cover:"https://i.ytimg.com/vi/L53gjP-TtGE/maxresdefault.jpg"
+},
 
-    {
-        title: "Gold Digger",
-        videoId: "6vwNcNOTVzY",
-        cover: "https://i.ytimg.com/vi/6vwNcNOTVzY/maxresdefault.jpg"
-    },
+{
+title:"HUMBLE.",
+artist:"Kendrick Lamar",
+videoId:"tvTRZJ-4EyI",
+cover:"https://i.ytimg.com/vi/tvTRZJ-4EyI/maxresdefault.jpg"
+},
 
-    {
-        title: "Power",
-        videoId: "L53gjP-TtGE",
-        cover: "https://i.ytimg.com/vi/L53gjP-TtGE/maxresdefault.jpg"
-    },
+{
+title:"DNA.",
+artist:"Kendrick Lamar",
+videoId:"NLZRYQMLDW4",
+cover:"https://i.ytimg.com/vi/NLZRYQMLDW4/maxresdefault.jpg"
+},
 
-    {
-        title: "Flashing Lights",
-        videoId: "ila-hAUXR5U",
-        cover: "https://i.ytimg.com/vi/ila-hAUXR5U/maxresdefault.jpg"
-    },
+{
+title:"Blinding Lights",
+artist:"The Weeknd",
+videoId:"4NRXx6U8ABQ",
+cover:"https://i.ytimg.com/vi/4NRXx6U8ABQ/maxresdefault.jpg"
+},
 
-    /* Kendrick Lamar */
-    {
-        title: "HUMBLE.",
-        videoId: "tvTRZJ-4EyI",
-        cover: "https://i.ytimg.com/vi/tvTRZJ-4EyI/maxresdefault.jpg"
-    },
+{
+title:"Starboy",
+artist:"The Weeknd",
+videoId:"34Na4j8AVgA",
+cover:"https://i.ytimg.com/vi/34Na4j8AVgA/maxresdefault.jpg"
+},
 
-    {
-        title: "DNA.",
-        videoId: "NLZRYQMLDW4",
-        cover: "https://i.ytimg.com/vi/NLZRYQMLDW4/maxresdefault.jpg"
-    },
+{
+title:"Magnolia",
+artist:"Playboi Carti",
+videoId:"oCveByMXd_0",
+cover:"https://i.ytimg.com/vi/oCveByMXd_0/maxresdefault.jpg"
+},
 
-    {
-        title: "Money Trees",
-        videoId: "smqhSl0u_sI",
-        cover: "https://i.ytimg.com/vi/smqhSl0u_sI/maxresdefault.jpg"
-    },
+{
+title:"Sky",
+artist:"Playboi Carti",
+videoId:"KnumAWWWgUE",
+cover:"https://i.ytimg.com/vi/KnumAWWWgUE/maxresdefault.jpg"
+},
 
-    {
-        title: "Alright",
-        videoId: "Z-48u_uWMHY",
-        cover: "https://i.ytimg.com/vi/Z-48u_uWMHY/maxresdefault.jpg"
-    },
+{
+title:"EARFQUAKE",
+artist:"Tyler, The Creator",
+videoId:"HmAsUQEFYGI",
+cover:"https://i.ytimg.com/vi/HmAsUQEFYGI/maxresdefault.jpg"
+},
 
-    {
-        title: "Swimming Pools",
-        videoId: "B5YNiCfWC3A",
-        cover: "https://i.ytimg.com/vi/B5YNiCfWC3A/maxresdefault.jpg"
-    },
-
-    /* The Weeknd */
-    {
-        title: "Blinding Lights",
-        videoId: "4NRXx6U8ABQ",
-        cover: "https://i.ytimg.com/vi/4NRXx6U8ABQ/maxresdefault.jpg"
-    },
-
-    {
-        title: "Starboy",
-        videoId: "34Na4j8AVgA",
-        cover: "https://i.ytimg.com/vi/34Na4j8AVgA/maxresdefault.jpg"
-    },
-
-    {
-        title: "The Hills",
-        videoId: "yzTuBuRdAyA",
-        cover: "https://i.ytimg.com/vi/yzTuBuRdAyA/maxresdefault.jpg"
-    },
-
-    {
-        title: "Save Your Tears",
-        videoId: "XXYlFuWEuKI",
-        cover: "https://i.ytimg.com/vi/XXYlFuWEuKI/maxresdefault.jpg"
-    },
-
-    {
-        title: "Die For You",
-        videoId: "QLCpqdqeoII",
-        cover: "https://i.ytimg.com/vi/QLCpqdqeoII/maxresdefault.jpg"
-    },
-
-    /* Playboi Carti */
-    {
-        title: "Magnolia",
-        videoId: "oCveByMXd_0",
-        cover: "https://i.ytimg.com/vi/oCveByMXd_0/maxresdefault.jpg"
-    },
-
-    {
-        title: "Sky",
-        videoId: "KnumAWWWgUE",
-        cover: "https://i.ytimg.com/vi/KnumAWWWgUE/maxresdefault.jpg"
-    },
-
-    {
-        title: "Shoota",
-        videoId: "j3EwWAMWM6Q",
-        cover: "https://i.ytimg.com/vi/j3EwWAMWM6Q/maxresdefault.jpg"
-    },
-
-    {
-        title: "R.I.P.",
-        videoId: "GRoa6w-wnT4",
-        cover: "https://i.ytimg.com/vi/GRoa6w-wnT4/maxresdefault.jpg"
-    },
-
-    {
-        title: "Long Time",
-        videoId: "VQHTROo0S8E",
-        cover: "https://i.ytimg.com/vi/VQHTROo0S8E/maxresdefault.jpg"
-    },
-
-    /* Tyler, The Creator */
-    {
-        title: "EARFQUAKE",
-        videoId: "HmAsUQEFYGI",
-        cover: "https://i.ytimg.com/vi/HmAsUQEFYGI/maxresdefault.jpg"
-    },
-
-    {
-        title: "See You Again",
-        videoId: "TGgcC5xg9YI",
-        cover: "https://i.ytimg.com/vi/TGgcC5xg9YI/maxresdefault.jpg"
-    },
-
-    {
-        title: "NEW MAGIC WAND",
-        videoId: "2w8KUgIkAu8",
-        cover: "https://i.ytimg.com/vi/2w8KUgIkAu8/maxresdefault.jpg"
-    },
-
-    {
-        title: "Yonkers",
-        videoId: "XSbZidsgMfw",
-        cover: "https://i.ytimg.com/vi/XSbZidsgMfw/maxresdefault.jpg"
-    },
-
-    {
-        title: "WUSYANAME",
-        videoId: "NJea386275c",
-        cover: "https://i.ytimg.com/vi/NJea386275c/maxresdefault.jpg"
-    }
+{
+title:"See You Again",
+artist:"Tyler, The Creator",
+videoId:"TGgcC5xg9YI",
+cover:"https://i.ytimg.com/vi/TGgcC5xg9YI/maxresdefault.jpg"
+}
 
 ];
 
@@ -302,59 +291,81 @@ let player;
 let currentSong;
 let isPlaying = false;
 
-const playPauseBtn = document.getElementById("playPauseBtn");
-const randomBtn = document.getElementById("randomBtn");
-const downloadBtn = document.getElementById("downloadBtn");
-const cover = document.getElementById("cover");
-const cd = document.getElementById("cd");
+const cover =
+document.getElementById("cover");
 
-function startSpin(){
-    cd.classList.add("spin");
-    cover.classList.add("spin");
-}
+const songTitle =
+document.getElementById("songTitle");
 
-function stopSpin(){
-    cd.classList.remove("spin");
-    cover.classList.remove("spin");
-}
+const songArtist =
+document.getElementById("songArtist");
 
+const timestamp =
+document.getElementById("timestamp");
+
+const playPauseBtn =
+document.getElementById("playPauseBtn");
+
+const randomBtn =
+document.getElementById("randomBtn");
+
+const downloadBtn =
+document.getElementById("downloadBtn");
+
+/* Random Song */
 function randomSong(){
 
-    currentSong = songs[Math.floor(Math.random() * songs.length)];
+    currentSong =
+    songs[Math.floor(Math.random()*songs.length)];
 
     cover.src = currentSong.cover;
+
+    songTitle.innerText =
+    currentSong.title.toUpperCase();
+
+    songArtist.innerText =
+    currentSong.artist.toUpperCase();
 
     if(player){
+
         player.loadVideoById(currentSong.videoId);
+
+        isPlaying = true;
+
+        /* same sprite */
+        playPauseBtn.style.opacity = "0.6";
     }
-
-    startSpin();
-
-    playPauseBtn.src = "Pause.webp";
-    isPlaying = true;
 }
 
+/* YouTube */
 function onYouTubeIframeAPIReady(){
 
-    currentSong = songs[Math.floor(Math.random() * songs.length)];
+    currentSong =
+    songs[Math.floor(Math.random()*songs.length)];
 
     cover.src = currentSong.cover;
 
-    player = new YT.Player('player', {
+    songTitle.innerText =
+    currentSong.title.toUpperCase();
 
-        height: '0',
-        width: '0',
+    songArtist.innerText =
+    currentSong.artist.toUpperCase();
 
-        videoId: currentSong.videoId,
+    player = new YT.Player('player',{
 
-        playerVars: {
-            autoplay: 1,
-            controls: 0
+        height:'0',
+        width:'0',
+
+        videoId:currentSong.videoId,
+
+        playerVars:{
+            autoplay:1,
+            controls:0
         },
 
-        events: {
-            'onReady': onPlayerReady,
-            'onStateChange': onPlayerStateChange
+        events:{
+            'onReady':onPlayerReady,
+            'onStateChange':onPlayerStateChange
         }
 
     });
@@ -366,9 +377,10 @@ function onPlayerReady(event){
 
     isPlaying = true;
 
-    playPauseBtn.src = "Pause.webp";
+    /* same sprite */
+    playPauseBtn.style.opacity = "0.6";
 
-    startSpin();
+    updateTimestamp();
 }
 
 function onPlayerStateChange(event){
@@ -378,7 +390,8 @@ function onPlayerStateChange(event){
     }
 }
 
-playPauseBtn.addEventListener("click", ()=>{
+/* Toggle */
+playPauseBtn.addEventListener("click",()=>{
 
     if(!player) return;
 
@@ -386,30 +399,32 @@ playPauseBtn.addEventListener("click", ()=>{
 
         player.pauseVideo();
 
-        playPauseBtn.src = "Play.webp";
-
-        stopSpin();
-
         isPlaying = false;
+
+        /* same sprite */
+        playPauseBtn.style.opacity = "1";
 
     }else{
 
         player.playVideo();
 
-        playPauseBtn.src = "Pause.webp";
-
-        startSpin();
-
         isPlaying = true;
+
+        /* same sprite */
+        playPauseBtn.style.opacity = "0.6";
     }
+
 });
 
-randomBtn.addEventListener("click", ()=>{
+/* Random */
+randomBtn.addEventListener("click",()=>{
 
     randomSong();
+
 });
 
-downloadBtn.addEventListener("click", ()=>{
+/* Download */
+downloadBtn.addEventListener("click",()=>{
 
     window.open(
         `https://ssyoutube.com/watch?v=${currentSong.videoId}`,
@@ -418,7 +433,44 @@ downloadBtn.addEventListener("click", ()=>{
 
 });
 
+/* Timestamp */
+function formatTime(sec){
+
+    sec = Math.floor(sec);
+
+    let minutes =
+    Math.floor(sec / 60);
+
+    let seconds =
+    sec % 60;
+
+    if(seconds < 10)
+        seconds = "0" + seconds;
+
+    return minutes + ":" + seconds;
+}
+
+function updateTimestamp(){
+
+    setInterval(()=>{
+
+        if(player && player.getCurrentTime){
+
+            let current =
+            player.getCurrentTime();
+
+            let duration =
+            player.getDuration();
+
+            timestamp.innerText =
+            `${formatTime(current)} / ${formatTime(duration)}`;
+
+        }
+
+    },500);
+}
+
 </script>
 
 </body>
-</html>
+   </html>

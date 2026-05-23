@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+    }
+
+    body{
+        width:100vw;
+        height:100vh;
+        overflow:hidden;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        background:black;
+        font-family:Arial, sans-serif;
+    }
+
+    .player{
+        position:relative;
+        width:500px;
+        height:500px;
+    }
+
+    /* Layer 0 */
+    .border{
+        position:absolute;
+        width:100%;
+        height:100%;
+        object-fit:contain;
+        z-index:0;
+        pointer-events:none;
+    }
+
+    /* Layer 2 */
+    .album-cover{
+        position:absolute;
+        width:250px;
+        height:250px;
+        border-radius:50%;
+        object-fit:cover;
+        top:50%;
+        left:50%;
+        transform:translate(-50%, -50%);
+        z-index:2;
+        box-shadow:0 0 20px rgba(0,0,0,0.7);
+    }
+
+    /* Layer 3 */
+    .cd{
+        position:absolute;
+        width:320px;
+        height:320px;
+        top:50%;
+        left:50%;
+        transform:translate(-50%, -50%);
+        z-index:3;
+        opacity:0.7;
+        pointer-events:none;
+    }
+
+    .spin{
+        animation:spin 5s linear infinite;
+    }
+
+    @keyframes spin{
+        from{
+            transform:translate(-50%, -50%) rotate(0deg);
+        }
+        to{
+            transform:translate(-50%, -50%) rotate(360deg);
+        }
+    }
+
+    .controls{
+        position:absolute;
+        width:100%;
+        bottom:35px;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        gap:25px;
+        z-index:5;
+    }
+
+    .btn{
+        width:70px;
+        height:70px;
+        cursor:pointer;
+        transition:0.2s;
+        user-select:none;
+    }
+
+    .btn:hover{
+        transform:scale(1.1);
+    }
+
+</style>
+</head>
+
+<body>
+
+<div class="player">
+
+    <!-- Layer 0 -->
+    <img src="Border.webp" class="border">
+
+    <!-- Layer 2 -->
+    <img id="cover" class="album-cover">
+
+    <!-- Layer 3 -->
+    <img src="CD.webp" id="cd" class="cd">
+
+    <div class="controls">
+
+        <!-- Play/Pause Toggle -->
+        <img id="playPauseBtn" class="btn" src="Play.webp">
+
+        <!-- Random -->
+        <img id="randomBtn" class="btn" src="Random.webp">
+
+        <!-- Download -->
+        <img id="downloadBtn" class="btn" src="Download.webp">
+
+    </div>
+
+</div>
+
+<!-- Hidden YouTube Player -->
+<div id="player" style="display:none;"></div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script>
+
+const songs = [
+
+    /* Kanye West */
+    {
+        title: "Stronger",
+        videoId: "PsO6ZnUZI0g",
+        cover: "https://i.ytimg.com/vi/PsO6ZnUZI0g/maxresdefault.jpg"
+    },
+
+    {
+        title: "Heartless",
+        videoId: "Co0tTeuUVhU",
+        cover: "https://i.ytimg.com/vi/Co0tTeuUVhU/maxresdefault.jpg"
+    },
+
+    {
+        title: "Gold Digger",
+        videoId: "6vwNcNOTVzY",
+        cover: "https://i.ytimg.com/vi/6vwNcNOTVzY/maxresdefault.jpg"
+    },
+
+    {
+        title: "Power",
+        videoId: "L53gjP-TtGE",
+        cover: "https://i.ytimg.com/vi/L53gjP-TtGE/maxresdefault.jpg"
+    },
+
+    {
+        title: "Flashing Lights",
+        videoId: "ila-hAUXR5U",
+        cover: "https://i.ytimg.com/vi/ila-hAUXR5U/maxresdefault.jpg"
+    },
+
+    /* Kendrick Lamar */
+    {
+        title: "HUMBLE.",
+        videoId: "tvTRZJ-4EyI",
+        cover: "https://i.ytimg.com/vi/tvTRZJ-4EyI/maxresdefault.jpg"
+    },
+
+    {
+        title: "DNA.",
+        videoId: "NLZRYQMLDW4",
+        cover: "https://i.ytimg.com/vi/NLZRYQMLDW4/maxresdefault.jpg"
+    },
+
+    {
+        title: "Money Trees",
+        videoId: "smqhSl0u_sI",
+        cover: "https://i.ytimg.com/vi/smqhSl0u_sI/maxresdefault.jpg"
+    },
+
+    {
+        title: "Alright",
+        videoId: "Z-48u_uWMHY",
+        cover: "https://i.ytimg.com/vi/Z-48u_uWMHY/maxresdefault.jpg"
+    },
+
+    {
+        title: "Swimming Pools",
+        videoId: "B5YNiCfWC3A",
+        cover: "https://i.ytimg.com/vi/B5YNiCfWC3A/maxresdefault.jpg"
+    },
+
+    /* The Weeknd */
+    {
+        title: "Blinding Lights",
+        videoId: "4NRXx6U8ABQ",
+        cover: "https://i.ytimg.com/vi/4NRXx6U8ABQ/maxresdefault.jpg"
+    },
+
+    {
+        title: "Starboy",
+        videoId: "34Na4j8AVgA",
+        cover: "https://i.ytimg.com/vi/34Na4j8AVgA/maxresdefault.jpg"
+    },
+
+    {
+        title: "The Hills",
+        videoId: "yzTuBuRdAyA",
+        cover: "https://i.ytimg.com/vi/yzTuBuRdAyA/maxresdefault.jpg"
+    },
+
+    {
+        title: "Save Your Tears",
+        videoId: "XXYlFuWEuKI",
+        cover: "https://i.ytimg.com/vi/XXYlFuWEuKI/maxresdefault.jpg"
+    },
+
+    {
+        title: "Die For You",
+        videoId: "QLCpqdqeoII",
+        cover: "https://i.ytimg.com/vi/QLCpqdqeoII/maxresdefault.jpg"
+    },
+
+    /* Playboi Carti */
+    {
+        title: "Magnolia",
+        videoId: "oCveByMXd_0",
+        cover: "https://i.ytimg.com/vi/oCveByMXd_0/maxresdefault.jpg"
+    },
+
+    {
+        title: "Sky",
+        videoId: "KnumAWWWgUE",
+        cover: "https://i.ytimg.com/vi/KnumAWWWgUE/maxresdefault.jpg"
+    },
+
+    {
+        title: "Shoota",
+        videoId: "j3EwWAMWM6Q",
+        cover: "https://i.ytimg.com/vi/j3EwWAMWM6Q/maxresdefault.jpg"
+    },
+
+    {
+        title: "R.I.P.",
+        videoId: "GRoa6w-wnT4",
+        cover: "https://i.ytimg.com/vi/GRoa6w-wnT4/maxresdefault.jpg"
+    },
+
+    {
+        title: "Long Time",
+        videoId: "VQHTROo0S8E",
+        cover: "https://i.ytimg.com/vi/VQHTROo0S8E/maxresdefault.jpg"
+    },
+
+    /* Tyler, The Creator */
+    {
+        title: "EARFQUAKE",
+        videoId: "HmAsUQEFYGI",
+        cover: "https://i.ytimg.com/vi/HmAsUQEFYGI/maxresdefault.jpg"
+    },
+
+    {
+        title: "See You Again",
+        videoId: "TGgcC5xg9YI",
+        cover: "https://i.ytimg.com/vi/TGgcC5xg9YI/maxresdefault.jpg"
+    },
+
+    {
+        title: "NEW MAGIC WAND",
+        videoId: "2w8KUgIkAu8",
+        cover: "https://i.ytimg.com/vi/2w8KUgIkAu8/maxresdefault.jpg"
+    },
+
+    {
+        title: "Yonkers",
+        videoId: "XSbZidsgMfw",
+        cover: "https://i.ytimg.com/vi/XSbZidsgMfw/maxresdefault.jpg"
+    },
+
+    {
+        title: "WUSYANAME",
+        videoId: "NJea386275c",
+        cover: "https://i.ytimg.com/vi/NJea386275c/maxresdefault.jpg"
+    }
+
+];
+
+let player;
+let currentSong;
+let isPlaying = false;
+
+const playPauseBtn = document.getElementById("playPauseBtn");
+const randomBtn = document.getElementById("randomBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const cover = document.getElementById("cover");
+const cd = document.getElementById("cd");
+
+function startSpin(){
+    cd.classList.add("spin");
+    cover.classList.add("spin");
+}
+
+function stopSpin(){
+    cd.classList.remove("spin");
+    cover.classList.remove("spin");
+}
+
+function randomSong(){
+
+    currentSong = songs[Math.floor(Math.random() * songs.length)];
+
+    cover.src = currentSong.cover;
+
+    if(player){
+        player.loadVideoById(currentSong.videoId);
+    }
+
+    startSpin();
+
+    playPauseBtn.src = "Pause.webp";
+    isPlaying = true;
+}
+
+function onYouTubeIframeAPIReady(){
+
+    currentSong = songs[Math.floor(Math.random() * songs.length)];
+
+    cover.src = currentSong.cover;
+
+    player = new YT.Player('player', {
+
+        height: '0',
+        width: '0',
+
+        videoId: currentSong.videoId,
+
+        playerVars: {
+            autoplay: 1,
+            controls: 0
+        },
+
+        events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+        }
+
+    });
+}
+
+function onPlayerReady(event){
+
+    event.target.playVideo();
+
+    isPlaying = true;
+
+    playPauseBtn.src = "Pause.webp";
+
+    startSpin();
+}
+
+function onPlayerStateChange(event){
+
+    if(event.data === 0){
+        randomSong();
+    }
+}
+
+playPauseBtn.addEventListener("click", ()=>{
+
+    if(!player) return;
+
+    if(isPlaying){
+
+        player.pauseVideo();
+
+        playPauseBtn.src = "Play.webp";
+
+        stopSpin();
+
+        isPlaying = false;
+
+    }else{
+
+        player.playVideo();
+
+        playPauseBtn.src = "Pause.webp";
+
+        startSpin();
+
+        isPlaying = true;
+    }
+});
+
+randomBtn.addEventListener("click", ()=>{
+
+    randomSong();
+});
+
+downloadBtn.addEventListener("click", ()=>{
+
+    window.open(
+        `https://ssyoutube.com/watch?v=${currentSong.videoId}`,
+        "_blank"
+    );
+
+});
+
+</script>
+
+</body>
+</html>

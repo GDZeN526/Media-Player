@@ -37,9 +37,7 @@ body{
     position:relative;
     width:520px;
     height:520px;
-    filter:
-        saturate(0.8)
-        contrast(1.2);
+    filter:saturate(0.8) contrast(1.2);
 }
 
 /* Border */
@@ -63,8 +61,7 @@ body{
     transform:translate(-50%, -56%);
     z-index:2;
 
-    border:
-        4px solid rgba(255,255,255,0.15);
+    border:4px solid rgba(255,255,255,0.15);
 
     filter:
         blur(1px)
@@ -73,6 +70,8 @@ body{
 
     box-shadow:
         0 0 30px rgba(0,0,0,0.8);
+
+    background:#111;
 }
 
 /* VHS Noise */
@@ -81,9 +80,14 @@ body{
     inset:0;
     z-index:20;
     pointer-events:none;
-    opacity:0.12;
-    mix-blend-mode:screen;
-    background-image:url("https://grainy-gradients.vercel.app/noise.svg");
+    opacity:0.08;
+
+    background:
+    repeating-linear-gradient(
+        transparent 0px,
+        rgba(255,255,255,0.03) 2px,
+        transparent 4px
+    );
 }
 
 /* Song Info */
@@ -110,6 +114,19 @@ body{
     font-size:14px;
     opacity:0.8;
     letter-spacing:1px;
+}
+
+/* Play/Pause Status */
+.status{
+    position:absolute;
+    top:110px;
+    width:100%;
+    text-align:center;
+    z-index:10;
+    color:#bdbdbd;
+    font-size:13px;
+    letter-spacing:3px;
+    text-shadow:2px 2px black;
 }
 
 /* Timestamp */
@@ -142,6 +159,7 @@ body{
     height:70px;
     cursor:pointer;
     transition:0.15s;
+
     filter:
         blur(0.5px)
         contrast(1.2);
@@ -174,8 +192,18 @@ body{
 
     </div>
 
+    <!-- Status -->
+    <div class="status" id="statusText">
+        PRESS PLAY
+    </div>
+
     <!-- Cover -->
-    <img id="cover" class="album-cover">
+    <img
+        id="cover"
+        class="album-cover"
+        src=""
+        crossorigin="anonymous"
+    >
 
     <!-- Timestamp -->
     <div class="timestamp" id="timestamp">
@@ -185,20 +213,26 @@ body{
     <!-- Controls -->
     <div class="controls">
 
-        <!-- Toggle Button -->
-        <img id="playPauseBtn"
-        class="btn"
-        src="Play.webp">
+        <!-- Play/Pause -->
+        <img
+            id="playPauseBtn"
+            class="btn"
+            src="Play.webp"
+        >
 
         <!-- Random -->
-        <img id="randomBtn"
-        class="btn"
-        src="Random.webp">
+        <img
+            id="randomBtn"
+            class="btn"
+            src="Random.webp"
+        >
 
         <!-- Download -->
-        <img id="downloadBtn"
-        class="btn"
-        src="Download.webp">
+        <img
+            id="downloadBtn"
+            class="btn"
+            src="Download.webp"
+        >
 
     </div>
 
@@ -207,82 +241,84 @@ body{
 
 </div>
 
-<div id="player" style="display:none;"></div>
+<!-- Hidden YouTube Player -->
+<div id="player"></div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
 
+/* Songs */
 const songs = [
 
 {
 title:"Heartless",
 artist:"Kanye West",
 videoId:"Co0tTeuUVhU",
-cover:"https://i.ytimg.com/vi/Co0tTeuUVhU/maxresdefault.jpg"
+cover:"https://img.youtube.com/vi/Co0tTeuUVhU/hqdefault.jpg"
 },
 
 {
 title:"Power",
 artist:"Kanye West",
 videoId:"L53gjP-TtGE",
-cover:"https://i.ytimg.com/vi/L53gjP-TtGE/maxresdefault.jpg"
+cover:"https://img.youtube.com/vi/L53gjP-TtGE/hqdefault.jpg"
 },
 
 {
 title:"HUMBLE.",
 artist:"Kendrick Lamar",
 videoId:"tvTRZJ-4EyI",
-cover:"https://i.ytimg.com/vi/tvTRZJ-4EyI/maxresdefault.jpg"
+cover:"https://img.youtube.com/vi/tvTRZJ-4EyI/hqdefault.jpg"
 },
 
 {
 title:"DNA.",
 artist:"Kendrick Lamar",
 videoId:"NLZRYQMLDW4",
-cover:"https://i.ytimg.com/vi/NLZRYQMLDW4/maxresdefault.jpg"
+cover:"https://img.youtube.com/vi/NLZRYQMLDW4/hqdefault.jpg"
 },
 
 {
 title:"Blinding Lights",
 artist:"The Weeknd",
 videoId:"4NRXx6U8ABQ",
-cover:"https://i.ytimg.com/vi/4NRXx6U8ABQ/maxresdefault.jpg"
+cover:"https://img.youtube.com/vi/4NRXx6U8ABQ/hqdefault.jpg"
 },
 
 {
 title:"Starboy",
 artist:"The Weeknd",
 videoId:"34Na4j8AVgA",
-cover:"https://i.ytimg.com/vi/34Na4j8AVgA/maxresdefault.jpg"
+cover:"https://img.youtube.com/vi/34Na4j8AVgA/hqdefault.jpg"
 },
 
 {
 title:"Magnolia",
 artist:"Playboi Carti",
 videoId:"oCveByMXd_0",
-cover:"https://i.ytimg.com/vi/oCveByMXd_0/maxresdefault.jpg"
+cover:"https://img.youtube.com/vi/oCveByMXd_0/hqdefault.jpg"
 },
 
 {
 title:"Sky",
 artist:"Playboi Carti",
 videoId:"KnumAWWWgUE",
-cover:"https://i.ytimg.com/vi/KnumAWWWgUE/maxresdefault.jpg"
+cover:"https://img.youtube.com/vi/KnumAWWWgUE/hqdefault.jpg"
 },
 
 {
 title:"EARFQUAKE",
 artist:"Tyler, The Creator",
 videoId:"HmAsUQEFYGI",
-cover:"https://i.ytimg.com/vi/HmAsUQEFYGI/maxresdefault.jpg"
+cover:"https://img.youtube.com/vi/HmAsUQEFYGI/hqdefault.jpg"
 },
 
 {
 title:"See You Again",
 artist:"Tyler, The Creator",
 videoId:"TGgcC5xg9YI",
-cover:"https://i.ytimg.com/vi/TGgcC5xg9YI/maxresdefault.jpg"
+cover:"https://img.youtube.com/vi/TGgcC5xg9YI/hqdefault.jpg"
 }
 
 ];
@@ -291,6 +327,7 @@ let player;
 let currentSong;
 let isPlaying = false;
 
+/* Elements */
 const cover =
 document.getElementById("cover");
 
@@ -303,6 +340,9 @@ document.getElementById("songArtist");
 const timestamp =
 document.getElementById("timestamp");
 
+const statusText =
+document.getElementById("statusText");
+
 const playPauseBtn =
 document.getElementById("playPauseBtn");
 
@@ -312,85 +352,115 @@ document.getElementById("randomBtn");
 const downloadBtn =
 document.getElementById("downloadBtn");
 
-/* Random Song */
-function randomSong(){
+/* Load Song */
+function loadSong(song){
 
-    currentSong =
-    songs[Math.floor(Math.random()*songs.length)];
+    currentSong = song;
 
-    cover.src = currentSong.cover;
+    cover.src = song.cover;
 
     songTitle.innerText =
-    currentSong.title.toUpperCase();
+    song.title.toUpperCase();
 
     songArtist.innerText =
-    currentSong.artist.toUpperCase();
+    song.artist.toUpperCase();
 
     if(player){
 
-        player.loadVideoById(currentSong.videoId);
+        player.loadVideoById(song.videoId);
 
-        isPlaying = true;
-
-        /* same sprite */
-        playPauseBtn.style.opacity = "0.6";
     }
 }
 
-/* YouTube */
-function onYouTubeIframeAPIReady(){
+/* Random Song */
+function randomSong(){
 
-    currentSong =
+    const random =
     songs[Math.floor(Math.random()*songs.length)];
 
-    cover.src = currentSong.cover;
+    loadSong(random);
+
+}
+
+/* YouTube Ready */
+function onYouTubeIframeAPIReady(){
+
+    const random =
+    songs[Math.floor(Math.random()*songs.length)];
+
+    currentSong = random;
+
+    cover.src = random.cover;
 
     songTitle.innerText =
-    currentSong.title.toUpperCase();
+    random.title.toUpperCase();
 
     songArtist.innerText =
-    currentSong.artist.toUpperCase();
+    random.artist.toUpperCase();
 
     player = new YT.Player('player',{
 
         height:'0',
         width:'0',
 
-        videoId:currentSong.videoId,
+        videoId:random.videoId,
 
         playerVars:{
-            autoplay:1,
+            autoplay:0,
             controls:0
         },
 
         events:{
-            'onReady':onPlayerReady,
-            'onStateChange':onPlayerStateChange
+            onReady:onPlayerReady,
+            onStateChange:onPlayerStateChange
         }
 
     });
+
 }
 
-function onPlayerReady(event){
+/* Ready */
+function onPlayerReady(){
 
-    event.target.playVideo();
+    statusText.innerText =
+    "READY TO PLAY";
 
-    isPlaying = true;
-
-    /* same sprite */
-    playPauseBtn.style.opacity = "0.6";
-
-    updateTimestamp();
 }
 
+/* Player States */
 function onPlayerStateChange(event){
 
-    if(event.data === 0){
-        randomSong();
+    if(event.data === YT.PlayerState.PLAYING){
+
+        isPlaying = true;
+
+        statusText.innerText =
+        "NOW PLAYING";
+
+        playPauseBtn.style.opacity = "0.6";
+
     }
+
+    if(event.data === YT.PlayerState.PAUSED){
+
+        isPlaying = false;
+
+        statusText.innerText =
+        "PAUSED";
+
+        playPauseBtn.style.opacity = "1";
+
+    }
+
+    if(event.data === YT.PlayerState.ENDED){
+
+        randomSong();
+
+    }
+
 }
 
-/* Toggle */
+/* Play/Pause */
 playPauseBtn.addEventListener("click",()=>{
 
     if(!player) return;
@@ -399,19 +469,10 @@ playPauseBtn.addEventListener("click",()=>{
 
         player.pauseVideo();
 
-        isPlaying = false;
-
-        /* same sprite */
-        playPauseBtn.style.opacity = "1";
-
     }else{
 
         player.playVideo();
 
-        isPlaying = true;
-
-        /* same sprite */
-        playPauseBtn.style.opacity = "0.6";
     }
 
 });
@@ -420,6 +481,12 @@ playPauseBtn.addEventListener("click",()=>{
 randomBtn.addEventListener("click",()=>{
 
     randomSong();
+
+    setTimeout(()=>{
+
+        player.playVideo();
+
+    },500);
 
 });
 
@@ -433,7 +500,7 @@ downloadBtn.addEventListener("click",()=>{
 
 });
 
-/* Timestamp */
+/* Time Format */
 function formatTime(sec){
 
     sec = Math.floor(sec);
@@ -450,27 +517,29 @@ function formatTime(sec){
     return minutes + ":" + seconds;
 }
 
-function updateTimestamp(){
+/* Timestamp Update */
+setInterval(()=>{
 
-    setInterval(()=>{
+    if(player && player.getCurrentTime){
 
-        if(player && player.getCurrentTime){
+        let current =
+        player.getCurrentTime();
 
-            let current =
-            player.getCurrentTime();
+        let duration =
+        player.getDuration();
 
-            let duration =
-            player.getDuration();
+        if(duration){
 
             timestamp.innerText =
             `${formatTime(current)} / ${formatTime(duration)}`;
 
         }
 
-    },500);
-}
+    }
+
+},500);
 
 </script>
 
 </body>
-   </html>
+</html>

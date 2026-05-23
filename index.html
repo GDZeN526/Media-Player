@@ -1,235 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Hip-Hop Media Player</title>
 
 <style>
-
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    image-rendering:pixelated;
-    image-rendering:crisp-edges;
+    image-rendering: pixelated;
 }
 
 body{
-    width:100vw;
+    background:#000;
     height:100vh;
-    overflow:hidden;
     display:flex;
     justify-content:center;
     align-items:center;
-
-    background:
-    repeating-linear-gradient(
-        0deg,
-        #000 0px,
-        #000 2px,
-        #050505 2px,
-        #050505 4px
-    );
-
-    font-family:"Courier New", monospace;
-
-    filter:
-        blur(0.6px)
-        contrast(1.15);
+    overflow:hidden;
+    font-family:Arial, sans-serif;
+    color:white;
 }
 
+/* OLD WEBSITE FILTER */
+body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    backdrop-filter: blur(2px) contrast(1.1);
+    background:
+        repeating-linear-gradient(
+            0deg,
+            rgba(255,255,255,0.03) 0px,
+            rgba(255,255,255,0.03) 1px,
+            transparent 2px,
+            transparent 4px
+        );
+    pointer-events:none;
+    z-index:9999;
+}
+
+/* PLAYER */
 .player{
     position:relative;
-    width:520px;
+    width:380px;
     height:520px;
 }
 
-/* BORDER */
+/* LAYER 1 BORDER */
 .border{
     position:absolute;
+    inset:0;
     width:100%;
     height:100%;
-    object-fit:contain;
-    z-index:0;
+    object-fit:cover;
+    z-index:1;
     pointer-events:none;
 }
 
-/* COVER */
-.album-cover{
+/* LAYER 2 COVER */
+.cover{
     position:absolute;
-
+    top:55px;
+    left:50%;
+    transform:translateX(-50%);
     width:250px;
     height:250px;
-
     object-fit:cover;
-
-    top:50%;
-    left:50%;
-
-    transform:translate(-50%, -56%);
-
+    border-radius:6px;
     z-index:2;
-
-    border:
-    4px solid rgba(255,255,255,0.15);
-
-    background:#111;
-
-    filter:
-        blur(1px)
-        contrast(1.2)
-        saturate(0.8);
-
-    box-shadow:
-        0 0 30px rgba(0,0,0,0.8);
+    filter:contrast(1.1) saturate(0.9);
 }
 
-/* SONG INFO */
-.song-info{
+/* INFO */
+.info{
     position:absolute;
-
-    top:40px;
-    left:50%;
-
-    transform:translateX(-50%);
-
-    width:80%;
-
+    bottom:145px;
+    width:100%;
     text-align:center;
-
-    color:white;
-
-    z-index:10;
-
-    text-shadow:2px 2px black;
+    z-index:3;
 }
 
 .song-title{
-    font-size:22px;
+    font-size:20px;
     font-weight:bold;
-    letter-spacing:2px;
+    margin-bottom:5px;
 }
 
-.song-artist{
-    font-size:14px;
+.artist{
     opacity:0.8;
-    letter-spacing:1px;
-    margin-top:5px;
-}
-
-/* STATUS */
-.status{
-    position:absolute;
-
-    top:105px;
-    width:100%;
-
-    text-align:center;
-
-    color:#cfcfcf;
-
-    z-index:10;
-
-    font-size:13px;
-
-    letter-spacing:3px;
-
-    text-shadow:2px 2px black;
+    font-size:14px;
 }
 
 /* TIMESTAMP */
-.timestamp{
+.progress-container{
     position:absolute;
-
-    bottom:115px;
+    bottom:110px;
     left:50%;
-
     transform:translateX(-50%);
-
-    color:#d8d8d8;
-
-    font-size:16px;
-
-    letter-spacing:2px;
-
-    z-index:10;
-
-    text-shadow:2px 2px black;
+    width:280px;
+    z-index:3;
 }
 
-/* CONTROLS */
+.time{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    margin-bottom:6px;
+}
+
+.progress{
+    width:100%;
+    height:8px;
+    background:#333;
+    border-radius:999px;
+    overflow:hidden;
+}
+
+.progress-bar{
+    width:0%;
+    height:100%;
+    background:white;
+}
+
+/* BUTTONS */
 .controls{
     position:absolute;
-
-    width:100%;
     bottom:30px;
-
+    left:50%;
+    transform:translateX(-50%);
     display:flex;
-
-    justify-content:center;
+    gap:25px;
     align-items:center;
-
-    gap:24px;
-
-    z-index:10;
-}
-
-.play-wrapper{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:4px;
+    z-index:3;
 }
 
 .btn{
-    width:70px;
-    height:70px;
-
+    background:none;
+    border:none;
     cursor:pointer;
-
-    transition:0.15s;
-
-    filter:
-        blur(0.5px)
-        contrast(1.2);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    color:white;
+    gap:5px;
+    font-size:12px;
 }
 
-.btn:hover{
+.btn img{
+    width:52px;
+    height:52px;
+    object-fit:contain;
+    transition:0.2s;
+}
+
+.btn:hover img{
     transform:scale(1.08);
 }
 
-/* PLAY TEXT */
-.play-text{
-    color:white;
-
-    font-size:12px;
-
-    letter-spacing:3px;
-
-    text-shadow:2px 2px black;
-
-    opacity:0.8;
+audio{
+    display:none;
 }
-
-/* VHS NOISE */
-.noise{
-    position:absolute;
-    inset:0;
-
-    z-index:20;
-
-    pointer-events:none;
-
-    opacity:0.08;
-
-    background:
-    repeating-linear-gradient(
-        transparent 0px,
-        rgba(255,255,255,0.03) 2px,
-        transparent 4px
-    );
-}
-
 </style>
 </head>
 
@@ -237,426 +171,261 @@ body{
 
 <div class="player">
 
-    <!-- BORDER -->
+    <!-- LAYER 1 -->
     <img src="Border.webp" class="border">
 
-    <!-- SONG INFO -->
-    <div class="song-info">
+    <!-- LAYER 2 -->
+    <img id="cover" class="cover">
 
-        <div
-            class="song-title"
-            id="songTitle">
-
-            LOADING...
-
-        </div>
-
-        <div
-            class="song-artist"
-            id="songArtist">
-
-            PLEASE WAIT
-
-        </div>
-
+    <!-- INFO -->
+    <div class="info">
+        <div id="title" class="song-title"></div>
+        <div id="artist" class="artist"></div>
     </div>
-
-    <!-- STATUS -->
-    <div
-        class="status"
-        id="statusText">
-
-        LOADED
-
-    </div>
-
-    <!-- COVER -->
-    <img
-        id="cover"
-        class="album-cover"
-        src="">
 
     <!-- TIMESTAMP -->
-    <div
-        class="timestamp"
-        id="timestamp">
+    <div class="progress-container">
+        <div class="time">
+            <span id="currentTime">0:00</span>
+            <span id="duration">0:00</span>
+        </div>
 
-        0:00 / 0:00
-
+        <div class="progress">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
     </div>
 
-    <!-- CONTROLS -->
+    <!-- LAYER 3 -->
     <div class="controls">
 
         <!-- PLAY -->
-        <div class="play-wrapper">
-
-            <img
-                id="playPauseBtn"
-                class="btn"
-                src="Play.webp">
-
-            <div
-                id="playText"
-                class="play-text">
-
-                PLAY
-
-            </div>
-
-        </div>
+        <button class="btn" id="playBtn">
+            <img src="Play.webp">
+            <span id="playText">Play</span>
+        </button>
 
         <!-- RANDOM -->
-        <img
-            id="randomBtn"
-            class="btn"
-            src="Random.webp">
+        <button class="btn" id="shuffleBtn">
+            <img src="Random.webp">
+            <span>Shuffle</span>
+        </button>
 
         <!-- DOWNLOAD -->
-        <img
-            id="downloadBtn"
-            class="btn"
-            src="Download.webp">
+        <button class="btn" id="downloadBtn">
+            <img src="Download.webp">
+            <span>Download</span>
+        </button>
 
     </div>
 
-    <!-- NOISE -->
-    <div class="noise"></div>
-
 </div>
 
-<!-- HIDDEN PLAYER -->
-<div
-    id="player"
-    style="
-        opacity:0;
-        pointer-events:none;
-        position:absolute;
-    ">
-</div>
-
-<script src="https://www.youtube.com/iframe_api"></script>
+<audio id="audio"></audio>
 
 <script>
+/*
+====================================================
+YOUTUBE MUSIC STYLE PLAYLIST
+(Replace audio URLs with your own MP3 links)
+====================================================
+*/
 
-/* SONGS */
 const songs = [
 
+/* Kendrick Lamar */
 {
-title:"Heartless",
-artist:"Kanye West",
-videoId:"Co0tTeuUVhU",
-cover:"https://img.youtube.com/vi/Co0tTeuUVhU/hqdefault.jpg"
+    title:"HUMBLE.",
+    artist:"Kendrick Lamar",
+    cover:"https://i.imgur.com/YqK0K1v.jpeg",
+    audio:"https://music.youtube.com/watch?v=H4RELGc9su8&si=IACddRaDUsu3JuS5"
+},
+{
+    title:"DNA.",
+    artist:"Kendrick Lamar",
+    cover:"https://i.imgur.com/YqK0K1v.jpeg",
+    audio:"https://music.youtube.com/watch?v=Fb3j_yuFh1s&si=4tZl2HDZpk8cho5_"
 },
 
+/* Kanye West */
 {
-title:"Power",
-artist:"Kanye West",
-videoId:"L53gjP-TtGE",
-cover:"https://img.youtube.com/vi/L53gjP-TtGE/hqdefault.jpg"
+    title:"Stronger",
+    artist:"Kanye West",
+    cover:"https://i.imgur.com/3VQ9Z8p.jpeg",
+    audio:"https://music.youtube.com/watch?v=12hLNbXKCs4&si=LybtFC1pXUYWrKQt"
+},
+{
+    title:"Heartless",
+    artist:"Kanye West",
+    cover:"https://i.imgur.com/3VQ9Z8p.jpeg",
+    audio:"https://music.youtube.com/watch?v=s40BTpfAELs&si=vYzXp4iESHQQBPaT"
+},
+    
+/* Tyler The Creator */
+{
+    title:"See You Again",
+    artist:"Tyler, The Creator",
+    cover:"https://i.imgur.com/l49aYS3.jpeg",
+    audio:"https://music.youtube.com/watch?v=EZE62LpaqHg&si=7M0Xd1137RdUC0DI"
+},
+{
+    title:"EARFQUAKE",
+    artist:"Tyler, The Creator",
+    cover:"https://i.imgur.com/l49aYS3.jpeg",
+    audio:"https://music.youtube.com/watch?v=t-E2gm0a_N0&si=ICf00xO-BGcbH_jH"
 },
 
+/* The Weeknd */
 {
-title:"HUMBLE.",
-artist:"Kendrick Lamar",
-videoId:"tvTRZJ-4EyI",
-cover:"https://img.youtube.com/vi/tvTRZJ-4EyI/hqdefault.jpg"
+    title:"Blinding Lights",
+    artist:"The Weeknd",
+    cover:"https://i.imgur.com/Zm7sJ6K.jpeg",
+    audio:"https://music.youtube.com/watch?v=J7p4bzqLvCw&si=7uL8oV9B4X6PAjO9"
+},
+{
+    title:"Starboy",
+    artist:"The Weeknd",
+    cover:"https://i.imgur.com/Zm7sJ6K.jpeg",
+    audio:"https://music.youtube.com/watch?v=3_g2un5M350&si=2_tUMLNMh-lTOWQt"
 },
 
+/* Playboi Carti */
 {
-title:"DNA.",
-artist:"Kendrick Lamar",
-videoId:"NLZRYQMLDW4",
-cover:"https://img.youtube.com/vi/NLZRYQMLDW4/hqdefault.jpg"
+    title:"Sky",
+    artist:"Playboi Carti",
+    cover:"https://i.imgur.com/Nw6L7bM.jpeg",
+    audio:"https://music.youtube.com/watch?v=6l_8PMBgymE&si=aXBzlAU4NM5Urii6"
 },
-
 {
-title:"Blinding Lights",
-artist:"The Weeknd",
-videoId:"4NRXx6U8ABQ",
-cover:"https://img.youtube.com/vi/4NRXx6U8ABQ/hqdefault.jpg"
-},
-
-{
-title:"Starboy",
-artist:"The Weeknd",
-videoId:"34Na4j8AVgA",
-cover:"https://img.youtube.com/vi/34Na4j8AVgA/hqdefault.jpg"
-},
-
-{
-title:"Magnolia",
-artist:"Playboi Carti",
-videoId:"oCveByMXd_0",
-cover:"https://img.youtube.com/vi/oCveByMXd_0/hqdefault.jpg"
-},
-
-{
-title:"Sky",
-artist:"Playboi Carti",
-videoId:"KnumAWWWgUE",
-cover:"https://img.youtube.com/vi/KnumAWWWgUE/hqdefault.jpg"
-},
-
-{
-title:"EARFQUAKE",
-artist:"Tyler, The Creator",
-videoId:"HmAsUQEFYGI",
-cover:"https://img.youtube.com/vi/HmAsUQEFYGI/hqdefault.jpg"
-},
-
-{
-title:"See You Again",
-artist:"Tyler, The Creator",
-videoId:"TGgcC5xg9YI",
-cover:"https://img.youtube.com/vi/TGgcC5xg9YI/hqdefault.jpg"
+    title:"Magnolia",
+    artist:"Playboi Carti",
+    cover:"https://i.imgur.com/Nw6L7bM.jpeg",
+    audio:"https://music.youtube.com/watch?v=sMrruvN56HA&si=lxGPfik9Sb_DSEsX"
 }
 
 ];
 
-let player;
-let currentSong;
-let isPlaying = false;
+const audio = document.getElementById("audio");
 
-/* ELEMENTS */
-const cover =
-document.getElementById("cover");
+const cover = document.getElementById("cover");
+const title = document.getElementById("title");
+const artist = document.getElementById("artist");
 
-const songTitle =
-document.getElementById("songTitle");
+const playBtn = document.getElementById("playBtn");
+const playText = document.getElementById("playText");
 
-const songArtist =
-document.getElementById("songArtist");
+const shuffleBtn = document.getElementById("shuffleBtn");
+const downloadBtn = document.getElementById("downloadBtn");
 
-const timestamp =
-document.getElementById("timestamp");
+const progressBar = document.getElementById("progressBar");
 
-const statusText =
-document.getElementById("statusText");
+const currentTimeEl = document.getElementById("currentTime");
+const durationEl = document.getElementById("duration");
 
-const playPauseBtn =
-document.getElementById("playPauseBtn");
-
-const playText =
-document.getElementById("playText");
-
-const randomBtn =
-document.getElementById("randomBtn");
-
-const downloadBtn =
-document.getElementById("downloadBtn");
+let currentSong = 0;
 
 /* LOAD SONG */
-function loadSong(song){
+function loadSong(index){
 
-    currentSong = song;
+    const song = songs[index];
 
+    title.textContent = song.title;
+    artist.textContent = song.artist;
     cover.src = song.cover;
 
-    songTitle.innerText =
-    song.title.toUpperCase();
-
-    songArtist.innerText =
-    song.artist.toUpperCase();
-
-    if(player){
-
-        player.loadVideoById(song.videoId);
-
-    }
-
+    audio.src = song.audio;
 }
 
-/* RANDOM SONG */
-function randomSong(){
-
-    const random =
-    songs[Math.floor(
-        Math.random()*songs.length
-    )];
-
-    loadSong(random);
-
-}
-
-/* YOUTUBE API */
-function onYouTubeIframeAPIReady(){
-
-    const random =
-    songs[Math.floor(
-        Math.random()*songs.length
-    )];
-
-    currentSong = random;
-
-    cover.src = random.cover;
-
-    songTitle.innerText =
-    random.title.toUpperCase();
-
-    songArtist.innerText =
-    random.artist.toUpperCase();
-
-    player = new YT.Player('player',{
-
-        height:'0',
-        width:'0',
-
-        videoId:random.videoId,
-
-        playerVars:{
-            autoplay:0,
-            controls:0
-        },
-
-        events:{
-            onReady:onPlayerReady,
-            onStateChange:onPlayerStateChange
-        }
-
-    });
-
-}
-
-/* READY */
-function onPlayerReady(){
-
-    statusText.innerText =
-    "READY";
-
-}
-
-/* STATE CHANGE */
-function onPlayerStateChange(event){
-
-    /* PLAYING */
-    if(event.data === YT.PlayerState.PLAYING){
-
-        isPlaying = true;
-
-        playText.innerText =
-        "PAUSE";
-
-        statusText.innerText =
-        "NOW PLAYING";
-
-        playPauseBtn.style.opacity =
-        "0.6";
-
-    }
-
-    /* PAUSED */
-    if(event.data === YT.PlayerState.PAUSED){
-
-        isPlaying = false;
-
-        playText.innerText =
-        "PLAY";
-
-        statusText.innerText =
-        "PAUSED";
-
-        playPauseBtn.style.opacity =
-        "1";
-
-    }
-
-    /* ENDED */
-    if(event.data === YT.PlayerState.ENDED){
-
-        randomSong();
-
-        setTimeout(()=>{
-
-            player.playVideo();
-
-        },300);
-
-    }
-
-}
+loadSong(currentSong);
 
 /* PLAY / PAUSE */
-playPauseBtn.addEventListener("click",()=>{
+playBtn.addEventListener("click", () => {
 
-    if(!player) return;
+    if(audio.paused){
 
-    if(isPlaying){
+        audio.play();
+        playText.textContent = "Pause";
 
-        player.pauseVideo();
+    } else {
 
-    }
-
-    else{
-
-        player.playVideo();
+        audio.pause();
+        playText.textContent = "Play";
 
     }
 
 });
 
-/* RANDOM */
-randomBtn.addEventListener("click",()=>{
+/* SHUFFLE */
+shuffleBtn.addEventListener("click", () => {
 
-    randomSong();
+    currentSong = Math.floor(Math.random() * songs.length);
 
-    setTimeout(()=>{
+    loadSong(currentSong);
 
-        player.playVideo();
+    audio.play();
 
-    },300);
+    playText.textContent = "Pause";
 
 });
 
 /* DOWNLOAD */
-downloadBtn.addEventListener("click",()=>{
+downloadBtn.addEventListener("click", () => {
 
-    window.open(
-        `https://ssyoutube.com/watch?v=${currentSong.videoId}`,
-        "_blank"
-    );
+    const link = document.createElement("a");
+
+    link.href = songs[currentSong].audio;
+
+    link.download = songs[currentSong].title + ".mp3";
+
+    link.click();
 
 });
 
-/* TIME FORMAT */
-function formatTime(sec){
+/* UPDATE BAR */
+audio.addEventListener("timeupdate", () => {
 
-    sec = Math.floor(sec);
+    const progress =
+        (audio.currentTime / audio.duration) * 100;
 
-    let minutes =
-    Math.floor(sec / 60);
+    progressBar.style.width = progress + "%";
 
-    let seconds =
-    sec % 60;
+    currentTimeEl.textContent =
+        formatTime(audio.currentTime);
 
-    if(seconds < 10)
+    durationEl.textContent =
+        formatTime(audio.duration);
+
+});
+
+/* FORMAT TIME */
+function formatTime(time){
+
+    if(isNaN(time)) return "0:00";
+
+    const minutes = Math.floor(time / 60);
+
+    let seconds = Math.floor(time % 60);
+
+    if(seconds < 10){
         seconds = "0" + seconds;
+    }
 
     return minutes + ":" + seconds;
 }
 
-/* TIMESTAMP */
-setInterval(()=>{
+/* AUTO NEXT SONG */
+audio.addEventListener("ended", () => {
 
-    if(player &&
-       player.getCurrentTime){
+    currentSong++;
 
-        let current =
-        player.getCurrentTime();
-
-        let duration =
-        player.getDuration();
-
-        if(duration){
-
-            timestamp.innerText =
-            `${formatTime(current)} / ${formatTime(duration)}`;
-
-        }
-
+    if(currentSong >= songs.length){
+        currentSong = 0;
     }
 
-},500);
+    loadSong(currentSong);
+
+    audio.play();
+
+});
 
 </script>
 
